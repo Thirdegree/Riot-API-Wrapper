@@ -32,3 +32,15 @@ class Riot(object):
 		summoner_id = summoner.json()['id']
 		return summoner_id
 
+	def get_masteries(self, summoner_Id, page=None, region='na'):
+		summoner_masteries = requests.get("http://prod.api.pvp.net/api/lol/%s/v1.1/summoner/%s/masteries?api_key=%s"%(region, summoner_Id, self.key))
+		if summoner_masteries.status_code == 404:
+			raise Errors.Summoner_Error("Summoner does not exist")
+		masteries = {i['name']: i['talents'] for i in summoner_masteries.json()['pages']}
+		if page:
+			return masteries[page]
+		else:
+			return masteries
+
+	def get_runes(self, summoner_Id, page=None, region='na'):
+		
