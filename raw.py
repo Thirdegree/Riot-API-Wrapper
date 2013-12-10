@@ -23,3 +23,12 @@ class Riot(object):
 			if champ['name'] == champ_name:
 				return champ
 		return None
+
+	def get_summoner_Id(self, summoner_name, region='na'):
+		summoner_name = summoner_name.replace(" ", "")
+		summoner = requests.get("http://prod.api.pvp.net/api/lol/%s/v1.1/summoner/by-name/%s?api_key=%s"%(region, summoner_name, self.key))
+		if summoner.status_code == 404:
+			raise Errors.Summoner_Error("Summoner does not exist")
+		summoner_id = summoner.json()['id']
+		return summoner_id
+
