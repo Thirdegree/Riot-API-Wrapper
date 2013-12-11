@@ -1,0 +1,1 @@
+If you try to request ranked information about a summoner with no ranked data, it 404's.
