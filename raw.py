@@ -43,4 +43,10 @@ class Riot(object):
 			return masteries
 
 	def get_runes(self, summoner_Id, page=None, region='na'):
-		
+		summoner_runes = requests.get("http://prod.api.pvp.net/api/lol/%s/v1.1/summoner/%s/runes?api_key=%s"%(region, summoner_Id, self.key))
+		if summoner_runes.status_code == 404:
+			raise Errors.Summoner_Error("Summoner does not exist")
+		slots = {summoner_runes.json()['pages'][i]['name']:summoner_runes.json()['pages'][i]['slots'] for i in range(len(summoner_runes.json()['pages']))}
+		l = {i:[s['rune']['name'] for s in slots[i]] for i in slots}
+		runes = {i:{m['rune']['name']:(m['rune']['description'], l[i].count(m['rune']['name'])) for m in slots[i]} for i in slots}
+		return runes
