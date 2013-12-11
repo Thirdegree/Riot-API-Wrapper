@@ -13,6 +13,7 @@ class Riot(object):
 	def get_all_champions(self, region='na'):
 		champions = requests.get("http://prod.api.pvp.net/api/lol/%s/v1.1/champion?api_key=%s"%(region, self.key)).json()
 		champion_list = []
+		#pulls the name of the champions from a dictionary that includes varius stats. Might add flags for more info later
 		for champ in champions['champions']:
 			champion_list.append(champ['name'])
 		return champion_list
@@ -37,7 +38,7 @@ class Riot(object):
 		if summoner_masteries.status_code == 404:
 			raise Errors.Summoner_Error("Summoner does not exist")
 		masteries = {i['name']: i['talents'] for i in summoner_masteries.json()['pages']}
-		if page:
+		if page and page in masteries:
 			return masteries[page]
 		else:
 			return masteries
@@ -46,6 +47,8 @@ class Riot(object):
 		summoner_runes = requests.get("http://prod.api.pvp.net/api/lol/%s/v1.1/summoner/%s/runes?api_key=%s"%(region, summoner_Id, self.key))
 		if summoner_runes.status_code == 404:
 			raise Errors.Summoner_Error("Summoner does not exist")
+		#I made this an hour ago and it already confuses me. But it does work perfectly, and it's not that hard to figure out
+		#with an example of the full .json in front of you
 		slots = {summoner_runes.json()['pages'][i]['name']:summoner_runes.json()['pages'][i]['slots'] for i in range(len(summoner_runes.json()['pages']))}
 		l = {i:[s['rune']['name'] for s in slots[i]] for i in slots}
 		runes = {i:{m['rune']['name']:(m['rune']['description'], l[i].count(m['rune']['name'])) for m in slots[i]} for i in slots}
